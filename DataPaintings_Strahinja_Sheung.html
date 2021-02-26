@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src= "emotions.js"></script>
+    <script src= "functions.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Cousine&family=Xanh+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        body{
+            background-color: #fff8f7;
+        }
+
+        .graphic{
+            position:absolute;
+            margin-top: 30px;
+            margin-left: -50px;
+            /*animation: rotation 8s infinite linear;*/
+        }
+        .gradient{
+            position:absolute;
+            margin-top: 150px;
+            margin-left: 300px;
+        }
+        .scatter{
+            position:absolute;
+            margin-top:  -800px;
+            margin-left: 1050px;
+        }
+        .gradientinfo{
+            position:absolute;
+            margin-top: 150px;
+            margin-left: 300px;
+        }
+        #firstMenu{
+            position:absolute;
+            z-index: 2;
+            margin-top: 10px;
+            margin-left: 1050px;
+            padding-left:100px;
+            padding-top:130px;
+            padding-right:100px;
+            padding-bottom: 800px;
+            opacity: 1;
+            transition: opacity 10s;
+            font-family: Cousine;
+            background-color: #E2DCDB;
+           
+        }
+        .closeMenu{
+            
+            all: unset;
+            position:absolute;
+            background-color: #E2DCDB;
+            border-color: #E2DCDB;
+            padding: 20px;
+           
+            color: black;
+            font-size: 18pt;
+            font-family: Cousine;
+            margin-left: 450px;
+            top: 20px; 
+        }
+        .closeMenu:hover{
+           
+            
+            position:absolute;
+            background-color: #E2DCDB;
+            border-color: #E2DCDB;
+            padding: 20px;
+            color:white;
+            font-size: 18pt;
+            font-family: Cousine;
+            margin-left: 450px;
+            top: 20px; 
+            cursor: pointer;
+        }
+        a.externalLink:link{
+            color: black;
+        }
+        a.externalLink:hover{
+            font-style: oblique;
+        }
+        .credit{
+            font-size: 1vw;
+        }
+
+        @keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+    </style>
+</head>
+    
+<body>
+   <div id ="firstMenu"><button class="closeMenu" onclick="Close()">X</button><p>The Plutchik emotion wheel is a theoretical framework for categorizing feelings. Psychologist Robert Plutchik assigned a colour for each emotion, with a deeper colour signifying a more intense emotion. Adopting a more data-oriented approach, we created a new version of emotion wheel using the 
+    <a href="http://saifmohammad.com/WebPages/wikiartemotions.html" target="_blank" class="externalLink">WikiArt Emotion Dataset.</a>
+     In the experiment, participants were asked to rate the emotions evoked by 4,105 pieces of art. In our project, we focus on non-black-and-white paintings from art movement such as color field painting in which colour is an important element in expressing emotions. The top 10 paintings receiving the highest rating from each emotion category were pixelsorted to create a gradient. </p>
+<div class="credit"><i>Data Paintings</i> is a project by <a href="http://saifmohammad.com/WebPages/wikiartemotions.html" target="_blank" class="externalLink">Strahinja Jovanovic</a> and <a href="http://www.sheungyiu.com" target="_blank" class="externalLink">Sheung Yiu</a></div>
+
+<script>
+
+function Close() {
+    var x = document.getElementById("firstMenu");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+  </script>
+
+
+</div>
+
+    <div class = "gradient"></div>
+    <div class = "gradientinfo"></div>
+    <div class = "graphic"></div>
+
+    
+     <script>
+    
+    var duration = 1000;
+    var margin = {top: 100, right: 30, bottom: 30, left: 60},
+        width = 800 - margin.left - margin.right,
+        height = 800 - margin.top - margin.bottom;
+    
+    percentage();
+    hsl();
+    updateDataGradient();
+    console.log(data);
+    console.log(dataGradient);
+
+
+    var svg1 = d3.select("body")
+                    .append("svg")
+                    .attr("width",innerWidth)
+                    .attr("height",innerHeight)
+                  
+    
+
+    var svg = d3.select(".gradient")
+                    .append("svg")
+                    .attr("width",700)
+                    .attr("height",1000);
+
+
+    var svg3 = d3.select(".gradientinfo")
+                    .append("svg")
+                    .attr("width",700)
+                    .attr("height",1000);
+
+
+
+    var rectangle = svg.append("rect")
+                    .attr("x", 0)
+                            .attr("y", 0)
+                            .attr("height", 500)
+                            .attr("width", 700)
+                            .style("fill","url(#svgGradient)"); 
+
+    var rectangle1 = svg3.append("rect");
+    var text1 = svg3.append("text1") 
+    var text2 = svg3.append("text2")           
+    var text3 = svg3.append("text3")
+                 
+
+    rectangle1 = svg3.selectAll("rect")
+                        .data(dataGradient)
+                        .enter()
+                            .append("rect")
+                            .attr("class","crect")
+                            .attr("x", function(d,i){return  i * (d.offsetFearNum +70) })
+                            .attr("y",550)
+                            .attr("height", 80)
+                            .attr("width", function(d,i){ return  d.offsetFearNum * 2 })
+                            .style("fill", function(d){return d.colorFear.hsl} ); 
+
+                            
+    text1 = svg3.selectAll("text1")
+                        .data(dataGradient)
+                        .enter()
+                            .append("text")
+                            .attr("x", function(d,i){return  i * (d.offsetFearNum + 70) })
+                            .attr("y",650)
+                            .style("fill", function(d){return d.colorFear.hsl} )
+                            .html(function(d){return  + d.colorFear.hue}); 
+
+    text2 = svg3.selectAll("text2")
+                        .data(dataGradient)
+                        .enter()
+                            .append("text")
+                            .attr("x", function(d,i){return  i * (d.offsetFearNum + 70) })
+                            .attr("y",670)
+                            .style("fill", function(d){return d.colorFear.hsl} )
+                            .html(function(d){return  + d.colorFear.saturation}); 
+    
+    text3 = svg3.selectAll("text3")
+                        .data(dataGradient)
+                        .enter()
+                            .append("text")
+                            .attr("x", function(d,i){return  i * (d.offsetFearNum + 70) })
+                            .attr("y",690)
+                            .style("fill", function(d){return d.colorFear.hsl} )
+                            .html(function(d){return  + d.colorFear.light}); 
+                            
+    text4 = svg3
+                .append("text")
+                .attr("x",0)
+                .attr("y",550)
+                .style("fill", "grey" )
+                .html("HSL:");
+    
+    svg3.selectAll("text")
+        .style("font-size","14px")
+        .style("font-family","Cousine")
+
+    
+                            
+    var rectangle3 = svg1.append("rect")
+            .attr("x", 320)
+            .attr("y", 0)
+            .attr("height", 60)
+            .attr("width", innerWidth)
+            .style("fill","#E2DCDB");
+
+    var rectangle4 = svg1.append("rect")
+            .attr("x", 320)
+            .attr("y", 0)
+            .attr("height", 10)
+            .attr("width", innerWidth)
+            .style("fill","url(#svgGradient)");
+    
+    
+    
+
+
+
+    var mainText = svg1.selectAll("MainText")
+                    .data(dataButtons)
+                    .enter()
+                    .append("text")
+                    .attr("x",300)
+                    .attr("y",70)
+                    .style("font-size","50px")
+                    .style("font-family","Xanh Mono")
+                    .style("fill","black")
+                    .style("opacity",0.1)
+                    .text("DataPainting: fear");
+
+    
+                                
+    var defs = svg.append("defs");
+    var gradient = defs.append("linearGradient")
+                .attr("id", "svgGradient");
+    var stops =  gradient.selectAll("stop")
+                .data(dataGradient)
+                .enter()
+                    .append("stop")
+                    .attr("offset", function(d){return d.offsetFearPer; })
+                    .attr("stop-color",function(d){ return d.colorFear.hsl});
+    
+    
+     
+                                  
+        
+    var menuSvg = d3.select(".graphic")
+            .append("svg")
+            .attr("width", 400 )//new value
+            .attr("height", 1000)
+
+    
+
+           
+    menuSvg.selectAll("a")
+                .data(dataButtons)
+                .enter()
+                .append("a")
+                .append("path")
+                .attr("id", function(d,i){return "path"+i+""})
+                .attr("d", "M164,25.3c-133.7-57-164,0-164,0S30.2,82.3,164,25.3z")
+                .style("fill","#E2DCDB")
+                .attr("transform", function(d,i){
+                    return "translate(50,"+(i+1.5)*(750)/10+") scale(1.4) rotate("+(i-3.7)*10+")"
+                })
+                
+                .style("opacity", 0.8)
+                .on("mouseover", function(e,d){
+                    d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .attr("d", "M164,25.3c-133.7-57-164,100-164,0S200.2,120.3,164,25.3z")
+                    .style("fill","url(#svgGradient)")
+                    
+                })
+                .on("mouseout", function(e,d){
+                    d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .attr("d", "M164,25.3c-133.7-57-164,0-164,0S30.2,82.3,164,25.3z")
+                    .style("fill","#E2DCDB")
+                })
+                .on ("click",function(e,d){
+                        var i = dataButtons.indexOf(d);
+                        drawSerie(i);
+                        d3.select(this)
+                    .style("fill","url(#svgGradient)")
+                    })
+                
+    var text = menuSvg.selectAll("text")
+                .data(dataButtons)
+                .enter()
+                .append("text")
+                .attr("x",function(d,i){
+                    return (i*5+180)
+                })
+                .attr("y",function(d,i){
+                    return (i+1)*100
+                })
+                .attr("dy",15)
+                .append("textPath")
+                .attr("startOffset","35%") //https://www.visualcinnamon.com/2015/09/placing-text-on-arcs/
+                .attr("xlink:href", function (d,i){
+                    return "#path"+i+""
+                })
+                .text(function(d){return d.emotion})
+                .attr("class", "menuText")
+                .style("fill","black")
+                .style("stroke","#000000")
+                .style("font-size","15px")
+                .style("opacity",0.3)
+                .style("font-family","Xanh Mono");
+                    
+     </script>
+     <div class="scatter">
+     <script>        
+     var svg = d3.select(".scatter")
+                    .append("svg")
+                    .attr("width", 600)
+                    .attr("height", 600)
+                    .append("g")
+                    .attr("transform","translate(" + margin.left + "," + margin.top + ")")
+    
+                    
+
+     var x = d3.scaleLinear()
+            .domain([0, 100])
+            .range([0, 500]);
+         svg.append("g")
+            .attr("transform","translate (0," + 450 + ")")
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("path")
+                .style("stroke","grey")
+                .style("stroke-opacity","0.3");
+
+        svg.append("text")
+            .attr("x", 500)
+            .attr("y", 490)
+            .style("position","absolute")
+            .style("font-size","13px")
+            .style("fill", "grey")
+            .text("light");
+       
+
+    var y = d3.scaleLinear()
+            .domain([0, 100])
+            .range([450,0]);
+        svg.append("g")
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll("path")
+                .style("stroke","grey")
+                .style("stroke-opacity","0.3");
+
+        svg.selectAll("g")
+            .selectAll("text")
+                .style("fill", "grey")
+
+        svg.append("text")
+            .attr("x", -60)
+            .attr("y", -20)
+            .style("position","absolute")
+            .text("saturation")
+            .style("font-size","13px")
+            .style("fill","grey");
+
+                    
+  
+
+    var circle = svg.append('g')
+            .selectAll("circle")
+            .data(dataGradient)
+            .enter()
+                .append("circle")
+                    .attr("cx", function(d){ return x(d.colorFear.light);})
+                    .attr("cy", function(d){ return y(d.colorFear.saturation);})
+                    .attr("r", function (d){ return d.offsetFearNum * 2;})
+                    .style("fill", function(d){ return d.colorFear.hsl})
+                    .attr("z-index","0")
+                    .on("mouseover",function(e,d){
+                        var marginLeft = d3.select(".scatter").node().getBoundingClientRect().left
+                        var marginTop = d3.select(".scatter").node().getBoundingClientRect().top
+                                        svg.append("text")
+                                            .attr("class","per")
+                                            .attr("x", e.pageX - marginLeft - 100)
+                                            .attr("y", e.pageY - marginTop - 100)
+                                            .text(function(){return d.offsetFearNum})
+                                            .style("font-family","Cousine")
+                                            .style("font-size","18px")
+                                            .style("fill",function(){ return d.colorFear.hsl})
+                                            .attr("opacity",1);
+
+                                        svg.selectAll("circle")
+                                            .attr("opacity",0);
+                                        d3.select(this)
+                                            .attr("opacity",0.4);
+        
+                             var circle1 = svg.append('g')
+                                            .attr("class","little")
+                                            .selectAll("circle")
+                                            .data(dataGradient)
+                                            .enter()
+                                                .append("circle")
+                                                    .attr("cx", function(){ return x(d.colorFear.light);})
+                                                    .attr("cy", function(){ return y(d.colorFear.saturation);})
+                                                    .attr("r", 4)
+                                                    .style("fill", function(){ return d.colorFear.hsl})
+                                                    .attr("opacity",1);
+                            var line1 = svg.append('g')
+                                                        .selectAll("line1")
+                                                        .data(dataGradient)
+                                                        .enter()
+                                                            .append("line")
+                                                            .style("stroke", function(){ return d.colorFear.hsl})
+                                                            .style("stroke-width", 0.5)
+                                                            .attr("x1", function(){ return x(d.colorFear.light);})
+                                                            .attr("y1", function(){ return y(d.colorFear.saturation);})
+                                                            .attr("x2", function(){ return x(d.colorFear.light);})
+                                                            .attr("y2", 450)
+                                                            .attr("opacity",1);
+
+                            var line2 = svg.append('g')
+                                                        .selectAll("line2")
+                                                        .data(dataGradient)
+                                                        .enter()
+                                                            .append("line")
+                                                            .style("stroke", function(){ return d.colorFear.hsl})
+                                                            .style("stroke-width", 0.5)
+                                                            .attr("x1", function(){ return x(d.colorFear.light);})
+                                                            .attr("y1", function(){ return y(d.colorFear.saturation);})
+                                                            .attr("x2", 0)
+                                                            .attr("y2", function(){ return y(d.colorFear.saturation);})
+                                                            .attr("opacity",1);
+                                                        })
+                                    .on("mouseout",function(e,d){
+                                       d3.selectAll(".per")
+                                            .remove();
+                                        d3.selectAll(".little")
+                                            .remove();
+                                        svg.selectAll("circle")
+                                            .attr("opacity",1)
+                                        svg.selectAll("line")
+                                            .attr("opacity",0);
+                                        svg.selectAll("circle1")
+                                            .attr("opacity",0)
+                                        }); 
+
+
+            
+    d3.selectAll('g.tick')
+        .select('line')
+        .style('stroke-width', 0.1);
+
+    svg.selectAll("text")
+        .style("font-family","Cousine")
+       
+                
+     </script>
+     </div>
+
+
+     
+
+
+</body>
+</html>
